@@ -14,17 +14,37 @@ The Azure AD Enable User action integrates with Microsoft Graph API to enable pr
 
 ## Configuration
 
-### Secrets
+### Authentication
 
-- `AZURE_AD_TOKEN` (required): Bearer token for Microsoft Graph API authentication
+This action supports two OAuth2 authentication methods:
 
-### Environment Variables
+#### OAuth2 Authorization Code Flow
 
-- `AZURE_AD_TENANT_URL` (optional): Custom Microsoft Graph API endpoint. Defaults to `https://graph.microsoft.com/v1.0`
+**Required Secrets:**
+- **`OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN`**: OAuth2 access token
+
+#### OAuth2 Client Credentials Flow
+
+**Required Secrets:**
+- **`OAUTH2_CLIENT_CREDENTIALS_CLIENT_SECRET`**: OAuth2 client secret
+
+**Required Environment Variables:**
+- **`OAUTH2_CLIENT_CREDENTIALS_TOKEN_URL`**: Token endpoint URL
+- **`OAUTH2_CLIENT_CREDENTIALS_CLIENT_ID`**: OAuth2 client ID
+
+**Optional Environment Variables:**
+- **`OAUTH2_CLIENT_CREDENTIALS_AUTH_STYLE`**: Authentication style (`InHeader`, `InParams`, or `AutoDetect`)
+- **`OAUTH2_CLIENT_CREDENTIALS_SCOPE`**: OAuth2 scope
+- **`OAUTH2_CLIENT_CREDENTIALS_AUDIENCE`**: OAuth2 audience
+
+### Required Environment Variables
+
+- **`ADDRESS`**: Azure AD API base URL (e.g., `https://graph.microsoft.com`)
 
 ### Input Parameters
 
-- `userPrincipalName` (required): The user principal name (UPN) of the user to enable (e.g., "user@example.com")
+- **`userPrincipalName`** (required): The user principal name (UPN) of the user to enable (e.g., "user@example.com")
+- **`address`** (optional): The Azure AD API base URL (overrides `ADDRESS` environment variable)
 
 ### Output Schema
 
@@ -48,15 +68,39 @@ The Azure AD Enable User action integrates with Microsoft Graph API to enable pr
 }
 ```
 
-### With Custom Tenant URL
+### With OAuth2 Client Credentials
 
 ```json
 {
-  "environment": {
-    "AZURE_AD_TENANT_URL": "https://graph.microsoft.com/beta"
-  },
   "script_inputs": {
-    "userPrincipalName": "user@company.com"
+    "userPrincipalName": "john.doe@company.com",
+    "address": "https://graph.microsoft.com"
+  },
+  "environment": {
+    "ADDRESS": "https://graph.microsoft.com",
+    "OAUTH2_CLIENT_CREDENTIALS_TOKEN_URL": "https://login.microsoftonline.com/{tenant-id}/oauth2/v2.0/token",
+    "OAUTH2_CLIENT_CREDENTIALS_CLIENT_ID": "your-client-id",
+    "OAUTH2_CLIENT_CREDENTIALS_SCOPE": "https://graph.microsoft.com/.default"
+  },
+  "secrets": {
+    "OAUTH2_CLIENT_CREDENTIALS_CLIENT_SECRET": "your-client-secret"
+  }
+}
+```
+
+### With OAuth2 Authorization Code
+
+```json
+{
+  "script_inputs": {
+    "userPrincipalName": "user@company.com",
+    "address": "https://graph.microsoft.com"
+  },
+  "environment": {
+    "ADDRESS": "https://graph.microsoft.com"
+  },
+  "secrets": {
+    "OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN": "your-access-token"
   }
 }
 ```
@@ -174,9 +218,9 @@ npm run validate
 **"userPrincipalName is required"**
 - Ensure the input parameter is provided and not empty
 
-**"AZURE_AD_TOKEN secret is required"**
-- Verify the secret is configured in your environment
-- Check token has not expired
+**"OAuth2 authentication is required"**
+- Verify OAuth2 secrets are configured in your environment
+- Check access token has not expired
 
 **"Failed to enable user: 401 Unauthorized"**
 - Token may be expired or invalid
