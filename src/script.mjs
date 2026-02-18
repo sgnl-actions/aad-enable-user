@@ -5,7 +5,7 @@
  * This allows the user to sign in and access resources.
  */
 
-import { getBaseURL, createAuthHeaders} from '@sgnl-actions/utils';
+import { getBaseURL, createAuthHeaders } from '@sgnl-actions/utils';
 
 /**
  * Helper function to enable a user account
