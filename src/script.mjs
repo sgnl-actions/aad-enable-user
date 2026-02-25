@@ -5,7 +5,7 @@
  * This allows the user to sign in and access resources.
  */
 
-import { getBaseURL, createAuthHeaders} from '@sgnl-actions/utils';
+import { getBaseURL, createAuthHeaders } from '@sgnl-actions/utils';
 
 /**
  * Helper function to enable a user account
@@ -56,6 +56,10 @@ export default {
     // Get base URL and authentication headers using utilities
     const baseUrl = getBaseURL(params, context);
     const headers = await createAuthHeaders(context);
+
+    if (!params.userPrincipalName || typeof params.userPrincipalName !== 'string' || !params.userPrincipalName.trim()) {
+      throw new Error('userPrincipalName parameter is required and cannot be empty');
+    }
 
     console.log(`Enabling user account: ${params.userPrincipalName}`);
 
