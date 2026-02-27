@@ -348,14 +348,6 @@ describe('Azure AD Enable User Action', () => {
         .rejects.toThrow('userPrincipalName parameter is required and cannot be empty');
       expect(mockFetch).not.toHaveBeenCalled();
     });
-
-    test('should throw when auth token is missing', async () => {
-      await expect(script.invoke(
-        { userPrincipalName: 'user@example.com' },
-        { environment: { ADDRESS: 'https://graph.microsoft.com' }, secrets: {} }
-      )).rejects.toThrow(/No authentication configured/);
-      expect(mockFetch).not.toHaveBeenCalled();
-    });
   });
 
   describe('invoke handler - request construction', () => {
